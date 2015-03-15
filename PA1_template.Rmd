@@ -112,5 +112,8 @@ print(median(newStepsPerDay$dailyCount))
 The mean and median values between the original data and the modified data are about the same.  If you look at the actual histograms you can see a bit of shifting.  Some values are higher and some values are lower.  This did not make much of a difference in the mean values even though we can seem some shifting in the histogram.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> ebaa41fad317c34bfb4c5c4a76f9bba5a1cb6e68
