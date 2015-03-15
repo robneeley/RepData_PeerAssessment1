@@ -113,11 +113,26 @@ The mean and median values between the original data and the modified data are a
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-## Still working on this section.  I might not make it into the commit before the deadline!##
+```{r}
+library(lattice)
+
+newStepCountWeekdays <- newStepCount %>% select(steps, date, interval, avgSteps) %>% mutate(Weekday=factor(ifelse(weekdays(date) %in% c("Saturday", "Sunday"), "Weekend", "Weekday"))) 
+head(newStepCountWeekdays)
+summary(newStepCountWeekdays)
+
+newStepsPerWeekday <- newStepCountWeekdays %>% select(interval, steps, Weekday) %>% group_by(Weekday, interval) %>% summarize(avg = mean(steps))
+print("Confirm sum of data")
+head(newStepsPerWeekday)
+summary(newStepsPerWeekday)
+
+xyplot( avg ~ interval | Weekday, data=newStepsPerWeekday, type="l", main="Average Step During Weekday or Weekend", ylab="Average Steps", xlab="5 Minute Intervals (24 hours clock)")
+
+```
+
 
 ```{r}
 
-library(knitr)
+require(knitr)
 
 knit2html("PA1_template.Rmd")
 if(interactive()) browseURL("PA1_template.html")

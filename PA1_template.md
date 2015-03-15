@@ -22,11 +22,15 @@ attach(act)
 ```
 
 ```
-## The following objects are masked from act (pos = 4):
+## The following objects are masked from act (pos = 3):
 ## 
 ##     date, interval, steps
 ## 
-## The following objects are masked from act (pos = 7):
+## The following objects are masked from act (pos = 5):
+## 
+##     date, interval, steps
+## 
+## The following objects are masked from act (pos = 8):
 ## 
 ##     date, interval, steps
 ```
@@ -268,4 +272,189 @@ The mean and median values between the original data and the modified data are a
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-## Still working on this section.  I might not make it into the commit before the deadline!##
+
+```r
+library(lattice)
+
+newStepCountWeekdays <- newStepCount %>% select(steps, date, interval, avgSteps) %>% mutate(Weekday=factor(ifelse(weekdays(date) %in% c("Saturday", "Sunday"), "Weekend", "Weekday"))) 
+head(newStepCountWeekdays)
+```
+
+```
+##      steps       date interval avgSteps Weekday
+## 1 1.716981 2012-10-01        0 1.716981 Weekday
+## 2 0.000000 2012-11-23        0 1.716981 Weekday
+## 3 0.000000 2012-10-28        0 1.716981 Weekend
+## 4 0.000000 2012-11-06        0 1.716981 Weekday
+## 5 0.000000 2012-11-24        0 1.716981 Weekend
+## 6 0.000000 2012-11-15        0 1.716981 Weekday
+```
+
+```r
+summary(newStepCountWeekdays)
+```
+
+```
+##      steps             date               interval         avgSteps      
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0   Min.   :  0.000  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8   1st Qu.:  2.486  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5   Median : 34.113  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5   Mean   : 37.383  
+##  3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2   3rd Qu.: 52.835  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0   Max.   :206.170  
+##     Weekday     
+##  Weekday:12960  
+##  Weekend: 4608  
+##                 
+##                 
+##                 
+## 
+```
+
+```r
+newStepsPerWeekday <- newStepCountWeekdays %>% select(interval, steps, Weekday) %>% group_by(Weekday, interval) %>% summarize(avg = mean(steps))
+print("Confirm sum of data")
+```
+
+```
+## [1] "Confirm sum of data"
+```
+
+```r
+head(newStepsPerWeekday)
+```
+
+```
+## Source: local data frame [6 x 3]
+## Groups: Weekday
+## 
+##   Weekday interval        avg
+## 1 Weekday        0 2.25115304
+## 2 Weekday        5 0.44528302
+## 3 Weekday       10 0.17316562
+## 4 Weekday       15 0.19790356
+## 5 Weekday       20 0.09895178
+## 6 Weekday       25 1.59035639
+```
+
+```r
+summary(newStepsPerWeekday)
+```
+
+```
+##     Weekday       interval           avg         
+##  Weekday:288   Min.   :   0.0   Min.   :  0.000  
+##  Weekend:288   1st Qu.: 588.8   1st Qu.:  2.047  
+##                Median :1177.5   Median : 28.133  
+##                Mean   :1177.5   Mean   : 38.988  
+##                3rd Qu.:1766.2   3rd Qu.: 61.263  
+##                Max.   :2355.0   Max.   :230.378
+```
+
+```r
+xyplot( avg ~ interval | Weekday, data=newStepsPerWeekday, type="l", main="Average Step During Weekday or Weekend", ylab="Average Steps", xlab="5 Minute Intervals (24 hours clock)")
+```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
+
+
+
+```r
+require(knitr)
+
+knit2html("PA1_template.Rmd")
+```
+
+```
+## 
+## 
+## processing file: PA1_template.Rmd
+```
+
+```
+##   |                                                                         |                                                                 |   0%  |                                                                         |...                                                              |   4%
+##   ordinary text without R code
+## 
+##   |                                                                         |.....                                                            |   8%
+## label: unnamed-chunk-13 (with options) 
+## List of 1
+##  $ cache: symbol F
+## 
+##   |                                                                         |........                                                         |  12%
+##   ordinary text without R code
+## 
+##   |                                                                         |...........                                                      |  17%
+## label: unnamed-chunk-14
+```
+
+```
+##   |                                                                         |..............                                                   |  21%
+##   ordinary text without R code
+## 
+##   |                                                                         |................                                                 |  25%
+## label: unnamed-chunk-15
+##   |                                                                         |...................                                              |  29%
+##   ordinary text without R code
+## 
+##   |                                                                         |......................                                           |  33%
+## label: unnamed-chunk-16
+##   |                                                                         |........................                                         |  38%
+##   ordinary text without R code
+## 
+##   |                                                                         |...........................                                      |  42%
+## label: unnamed-chunk-17
+```
+
+```
+##   |                                                                         |..............................                                   |  46%
+##   ordinary text without R code
+## 
+##   |                                                                         |................................                                 |  50%
+## label: unnamed-chunk-18
+##   |                                                                         |...................................                              |  54%
+##   ordinary text without R code
+## 
+##   |                                                                         |......................................                           |  58%
+## label: unnamed-chunk-19
+##   |                                                                         |.........................................                        |  62%
+##    inline R code fragments
+## 
+##   |                                                                         |...........................................                      |  67%
+## label: unnamed-chunk-20
+```
+
+```
+##   |                                                                         |..............................................                   |  71%
+##   ordinary text without R code
+## 
+##   |                                                                         |.................................................                |  75%
+## label: unnamed-chunk-21
+##   |                                                                         |...................................................              |  79%
+##   ordinary text without R code
+## 
+##   |                                                                         |......................................................           |  83%
+## label: unnamed-chunk-22
+##   |                                                                         |.........................................................        |  88%
+##   ordinary text without R code
+## 
+##   |                                                                         |............................................................     |  92%
+## label: unnamed-chunk-23
+```
+
+```
+##   |                                                                         |..............................................................   |  96%
+##   ordinary text without R code
+## 
+##   |                                                                         |.................................................................| 100%
+## label: unnamed-chunk-24
+```
+
+```
+## output file: PA1_template.md
+```
+
+```r
+if(interactive()) browseURL("PA1_template.html")
+```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
