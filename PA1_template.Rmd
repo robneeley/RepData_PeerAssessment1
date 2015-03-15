@@ -114,3 +114,12 @@ The mean and median values between the original data and the modified data are a
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ## Still working on this section.  I might not make it into the commit before the deadline!##
+
+```{r}
+
+library(knitr)
+
+knit2html("PA1_template.Rmd")
+if(interactive()) browseURL("PA1_template.html")
+
+```
