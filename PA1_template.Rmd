@@ -1,0 +1,114 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
+
+## Loading and preprocessing the data
+Use the data.table to import and query against the dataset
+```{r cache=F}
+
+library(data.table)
+
+library(lubridate)
+
+act <- read.table(file="activity.csv", header=T, sep=",", row.names=NULL, stringsAsFactors=F)
+
+## convert the date to actual date type
+act$date <- ymd(act$date)
+
+attach(act)
+
+```
+
+## What is mean total number of steps taken per day?
+```{r}
+library(dplyr)
+
+stepsPerDay <- act %>% filter(complete.cases(act)) %>% select(date, steps) %>% group_by(date) %>% summarize(dailyCount = sum(steps))
+print("Confirm sum of data")
+head(stepsPerDay)
+
+par(mfrow=c(1,1))
+hist(stepsPerDay$dailyCount, breaks=35, xlab="Steps by Day (Should label with date)", ylab="Sum of steps per day", main="Frequency of Steps Per Day")
+
+```
+
+Mean of steps taken per day: 
+``` {r} 
+print(mean(stepsPerDay$dailyCount))
+```
+
+Media of steps taken per day:
+``` {r} 
+print(median(stepsPerDay$dailyCount))
+```
+
+
+## What is the average daily activity pattern?
+
+```{r}
+averStepsPerInterval <- act %>% filter(complete.cases(act)) %>% select(interval, steps) %>% group_by(interval) %>% summarize(avgSteps = mean(steps))
+
+print("Confirm group and avg of data")
+head(averStepsPerInterval)
+
+plot(x=averStepsPerInterval$interval, y=averStepsPerInterval$avgSteps, type="l", xlab="Intervals (24 hour on 5 minute increments)", ylab="Average Steps Taken Per Interval", main="Average of Time Intervals Across All Days")
+
+```
+
+Which 5 minute increment contains the maximum number of steps:
+```{r}
+averStepsPerInterval[max(averStepsPerInterval$avgSteps), ]
+
+``` 
+Roughly around 5PM at night.  This probably correlates with leaving work and coming home.
+
+
+## Imputing missing values
+```{r}
+misValues <- act %>% filter(!complete.cases(act))
+head(misValues)
+summary(misValues)
+length(misValues[is.na(misValues$steps),1])
+```
+Total number of missing steps is `r length(misValues[is.na(misValues$steps),1])`
+
+Replace NA values with the average for the given interval period
+
+```{r}
+
+newStepCount <- merge(act, averStepsPerInterval, by="interval")
+newStepCount <- newStepCount %>% mutate(steps= ifelse(is.na(steps), avgSteps, steps))
+
+#Confirm that all NA's have been removed.
+sum(!complete.cases(newStepCount))
+
+newStepsPerDay <- newStepCount %>% select(date, steps) %>% group_by(date) %>% summarize(dailyCount = sum(steps))
+print("Confirm sum of data")
+head(newStepsPerDay)
+summary(newStepCount)
+
+par(mfrow=c(2,1))
+hist(newStepsPerDay$dailyCount, breaks=35, xlab="Steps by Day (Should label with date)", ylab="Sum of steps per day", main="Frequency of Steps Per Day (Modified to remove NA)")
+
+hist(stepsPerDay$dailyCount, breaks=35, xlab="Steps by Day (Should label with date)", ylab="Sum of steps per day", main="Frequency of Steps Per Day (Original Unmodified Data")
+
+```
+
+Mean of steps taken per day (NA replaced with interval mean): 
+``` {r} 
+print(mean(newStepsPerDay$dailyCount))
+```
+
+Media of steps taken per day (NA replaced with interval mean):
+``` {r} 
+print(median(newStepsPerDay$dailyCount))
+```
+
+```
+
+The mean and median values between the original data and the modified data are about the same.  If you look at the actual histograms you can see a bit of shifting.  Some values are higher and some values are lower.  This did not make much of a difference in the mean values even though we can seem some shifting in the histogram.
+
+## Are there differences in activity patterns between weekdays and weekends?
